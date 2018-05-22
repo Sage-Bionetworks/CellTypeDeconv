@@ -44,6 +44,7 @@ Estimate.All.CellTypes <- function(Dat, Lab, Thresh = 1){
   l2$Main <- Main
   l2$M <- M 
   l2$Disp <- Main$Disp
+  l2$In <- In 
   
   return(l2)
 }
@@ -116,4 +117,36 @@ Generate.Mix <- function(M, Disp, NoSamp, W = NULL){
   return(l)
   
 }
+
+
+Convert2Counts <- function(Dat, Lab, ldl = NULL){
+  
+  library(monocle)
+  Lab <- data.frame(Lab)
+
+  names(Dat)<-seq(1,dim(Dat)[2])
+  
+  Genes <- c(1:dim(Dat)[1])
+  Genes <- data.frame(Genes)
+
+  pd <- new("AnnotatedDataFrame", data = Lab)
+  fd <- new("AnnotatedDataFrame", data = Genes)
+  
+  if(is.null(ldl)){
+    ldl <- min(Dat) 
+  }
+
+  HSMM <- newCellDataSet(as.matrix(Dat),
+                         phenoData = pd,
+                         featureData = fd,
+                         lowerDetectionLimit = ldl,
+                         expressionFamily = tobit(Lower = 0.1))
+  
+  
+  rpc_matrix <- round(relative2abs(HSMM, method = "num_genes"))
+  
+  return(rpc_matrix)
+  
+}
+
 
