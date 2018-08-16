@@ -19,12 +19,12 @@ Estimate.Parameters <- function(Dat, Lab){
 
 Estimate.All.CellTypes <- function(Dat, Lab, Thresh = 1){
   
-  In <- which(rowSums(Dat) >= Thresh)
-  Dat <- Dat[In,]
+  In_genes <- which(rowSums(Dat) >= Thresh)
+  Dat <- Dat[In_genes,]
   
   NoTypes <- length(unique(Lab))
   
-  M <- matrix(rep(0,length(In)*NoTypes),nrow=length(In),ncol=NoTypes)
+  M <- matrix(rep(0,length(In_genes)*NoTypes),nrow=length(In_genes),ncol=NoTypes)
 
   l <- list()
   
@@ -45,7 +45,7 @@ Estimate.All.CellTypes <- function(Dat, Lab, Thresh = 1){
   l2$M <- M 
   l2$Disp <- Main$Disp
   l2$In <- In 
-  
+  l2$In_genes <- In_genes
   return(l2)
 }
 
@@ -88,6 +88,24 @@ Generate.Pure <- function(M, Disp, NoSamp){
 }
 
 
+Generate.PureDF <- function(M, Disp){
+  
+  s <- dim(M)
+  
+  l <- list()
+  
+  for (i in 1:s[2]){
+    l[[i]] <- Gen.Data.Given.Params(M[,i], Disp, 1)
+    
+  }
+  
+  l<- as.data.frame(l)
+  colnames(l) <- c(1:s[2])
+  
+  return(l)
+}
+
+
 Generate.Mix <- function(M, Disp, NoSamp, W = NULL){
   
   s <- dim(M)
@@ -111,8 +129,8 @@ Generate.Mix <- function(M, Disp, NoSamp, W = NULL){
     Dat[,i] <- Gen.Data.Given.Params(tmp$M, tmp$Disp, 1)
   }
   
-  l$Dat <- Dat 
-  l$W <- W
+  l$Dat <- as.data.frame(Dat) 
+  l$W <- as.data.frame(W)
   
   return(l)
   

@@ -1,4 +1,12 @@
+#Path to folder containing code 
 setwd('E:/SageDocs/CellTypeDeconv/')
+
+#load required packages 
+require(DESeq)
+require(monocle)
+require(MASS)
+
+#load codes 
 source('DESeq_Helper.R')
 
 #Load data 
@@ -14,10 +22,13 @@ Dat <- data.frame(Convert2Counts(Dat, Lab))
 
 #Estimate parameters 
 l <- Estimate.All.CellTypes(Dat, Lab)
+GeneIn <- l$In_genes
 
 #Simulate data for pure cell types 
 NoSamp <- 10
-PureData <- Generate.Pure(l$M, l$Disp, NoSamp = NoSamp)
+PureData <- Generate.PureDF(l$M, l$Disp)
+PureData$Gene <- GeneNames[GeneIn]
 
 #Simulate data for random mixtures 
 MixData <- Generate.Mix(l$M, l$Disp, NoSamp = NoSamp)
+MixData$Dat$Gene <- GeneNames[GeneIn]
